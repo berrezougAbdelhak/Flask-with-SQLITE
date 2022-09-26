@@ -65,7 +65,6 @@ class UserRegister(Resource):
             connection.close()
 
             return {"message":"User created successfuly"},201
-        else:
-            return {"message": "User exists already"}
+        return {"message": "User exists already"},400
 
 
