@@ -1,4 +1,8 @@
+from importlib.resources import Resource
 import sqlite3
+import string
+from typing_extensions import Required
+from flask_restful import Resource,reqparse
 
 class User():
     def __init__(self,_id,username,password) -> None:
@@ -41,3 +45,27 @@ class User():
         connection.close()
 
         return user
+
+class UserRegister(Resource):
+    parser=reqparse.RequestParser()
+    parser.add_argument("username",type=str,required=True,help="You have to add the username")
+    parser.add_argument("password",type=str,required=True,help="You have to add the password")
+    def post(self):
+        data=UserRegister.parser.parse_args()
+        if not User.find_by_username(data["username"]):
+
+            connection=sqlite3.connect("data.db")
+            cursor=connection.cursor()
+            query="INSERT INTO users VALUES (NULL,?,?)"
+
+            cursor.execute(query, (data["username"],data["password"]))
+
+            connection.commit()
+
+            connection.close()
+
+            return {"message":"User created successfuly"},201
+        else:
+            return {"message": "User exists already"}
+
+
